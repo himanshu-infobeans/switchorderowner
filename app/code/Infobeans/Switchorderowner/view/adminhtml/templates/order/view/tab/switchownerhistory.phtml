@@ -1,0 +1,60 @@
+<div class="switchownerhistory">
+    <table  cellspacing="0" class="data-table admin__table-primary" id="order_owner_history_table">
+        <thead>
+            <tr class="headings">
+                <th class="data-grid-th"><span><?php echo __('Order Owner Switched To'); ?></span></th>
+                <th><span><?php echo __('Owner Switched By'); ?></span></th>
+                <th><span><?php echo __('Customer Notified'); ?></span></th>
+                <th><span><?php echo __('Time'); ?></span></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if(count($block->getHistory()) > 1):
+            foreach ($block->getHistory() as $item): 
+                ?>
+                <tr class="ownerhistory_rows">
+                    <td>
+                        <strong>
+                            <?php
+                            $name = $item->getCustomer()->getName();
+//                            $url =  $item->getCustomerUrl(); 
+                            $url =  'http://local.magento2ee.com/admin/customer/index/edit/id/1/';
+                            $email = $item->getCustomer()->getEmail();
+                            ?>
+                            <a href="<?php echo $url  ?>" target="_blank" title="<?php echo $name ?>"><span><?php echo " (" . $email . ")" ?></span></a>
+                        </strong>
+                    </td>
+                    <td>
+                        <?php
+                        $adminUserName = $item->getAdmin()->getUsername();
+//                                    $adminUserUrl = $item->getAdminUrl();
+                        $adminUserEmail = $item->getAdmin()->getEmail();
+                        ?>
+                        <?php if ($adminUserName != "") { ?>
+                            <strong>
+                                <a href="<?php // echo $adminUserUrl  ?>" target="_blank" title="<?php echo __($adminUserName) ?>"><span><?php echo " (" . $adminUserEmail . ")" ?></span></a>
+                            </strong>
+                        <?php } ?>
+                    </td>
+                    <td>
+                        <strong class="subdue">
+                            <?php if ($item->getIsNotified()): ?>
+                                    <img width="16" height="16" alt="" src="<?php echo $this->getViewFileUrl('Infobeans_Switchorderowner::images/notified_success.gif'); ?>">
+                            <?php else : ?>
+                                    <img width="16" height="16" alt="" src="<?php echo $this->getViewFileUrl('Infobeans_Switchorderowner::images/notified_not.png'); ?>">
+                            <?php endif; ?>
+                        </strong>
+                    </td>
+                    <td>
+                        <span><?php echo __($item->getAssignTime()); ?></span>
+                    </td>
+                </tr>
+            <?php 
+            endforeach; 
+            endif;
+            ?>
+
+        </tbody>
+    </table>
+</div>

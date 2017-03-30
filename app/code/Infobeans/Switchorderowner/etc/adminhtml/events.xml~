@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="core_block_abstract_prepare_layout_after">
+        <observer name="ib_switchorderowner_generate_blocks_after" instance="Infobeans\Switchorderowner\Observer\generateBlockAfter"/>
+    </event>
+    <event name="core_block_abstract_prepare_layout_after">
+        <observer name="ib_switchorderowner_mass_action_option" instance="Infobeans\Switchorderowner\Observer\massActionOption"/>
+    </event>
+</config>

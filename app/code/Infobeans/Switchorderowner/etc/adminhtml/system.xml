@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="infobeans" translate="label" sortOrder="1000">
+            <label>Infobeans Extension</label>
+        </tab>
+        <section id="switchorderowner" type="text" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Switch Order Owner</label>
+            <tab>infobeans</tab>
+            <resource>Infobeans_Switchorderowner::config_switchorderowner</resource>
+            <group id="order_setting" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Order Settings</label>
+                <field id="orderstate" type="multiselect" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Select Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                    <comment>Orders having selected status can not be switched to other customer.</comment>
+                </field>
+            </group>
+            <group id="address" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+                <label>Overwrite Settings</label>
+                <field id="override_billing_shipping" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled Billing/Shipping Address Overwrite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If enable than customer's billing/shipping address overwrite in orders.</comment>
+                </field>
+                <field id="override_name" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enabled Customer Name Overwrite</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>If enable than customer's name overwrite in orders.</comment>
+                </field>
+            </group>
+            <group id="notification" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+                <label>Customer Notification</label>
+                <field id="enabled" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1" >
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="identity" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Switch Order Owner Notification Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+                <field id="template" type="select" translate="label" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Switch Order Owner Notification Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="copy_to" type="text" translate="label comment" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send Switch Order Owner Notification Copy To Admin</label>
+                    <comment>Comma-separated.</comment>
+                </field>
+            </group>            
+        </section>
+    </system>
+</config>

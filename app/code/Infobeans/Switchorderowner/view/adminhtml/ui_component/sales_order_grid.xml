@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <listingToolbar name="listing_top">
+        <massaction name="listing_massaction">
+            <action name="switch_order_owner">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">switch_order_owner</item>
+                        <item name="label" xsi:type="string" translate="true">Switch Order Owner</item>
+                        <item name="url" xsi:type="url" path="switchorderowner/order/switchOrderOwner"/>
+                        <item name="callback" xsi:type="array">
+                            <item name="provider" xsi:type="string">sales_order_grid.sales_order_grid.myhanlder.massaction-switchowner-custom-handler</item>
+                            <item name="target" xsi:type="string">switchOwner</item>
+                    </item>
+                    </item>
+                </argument>
+            </action>
+        </massaction>
+    </listingToolbar>
+    <container name="myhanlder">
+        <component name="massaction-switchowner-custom-handler">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">Infobeans_Switchorderowner/js/grid/massaction/switchowner-customhandler</item>
+                </item>
+            </argument>
+        </component>
+    </container>
+</listing>
+

@@ -1,0 +1,30 @@
+.switchownerpopup{
+    width: 60%;
+    left: 290px;
+}
+
+.switchowner_store_dropdown, .admin__control-select{
+    width: 74% !important;
+}
+.chosen-container{
+    width: 250px !important;
+}
+
+#order_owner_history_table{
+    border: 1px solid darkgrey;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#order_owner_history_table .headings{
+    background: lightgray
+}
+
+#order_owner_history_table .headings th{
+    border: 1px solid #dddddd; text-align: center; padding: 8px;
+}
+
+#order_owner_history_table .ownerhistory_rows td{
+    border: 1px solid #dddddd; text-align: left; padding: 8px; 
+}
+

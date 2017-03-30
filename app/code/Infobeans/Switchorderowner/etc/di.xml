@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Backend\Block\Widget\Button\Toolbar">
+        <plugin name="orderFormToolbarButtons" type="Infobeans\Switchorderowner\Plugin\Widget\Context" sortOrder="10"/>
+    </type>
+<!--    <virtualType name="SwitchorderownerhistoryGridDataProvider" type="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+        <arguments>
+            <argument name="collection" xsi:type="object" shared="false">Infobeans\Switchorderowner\Model\ResourceModel\History\Collection</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="switch_order_owner_history_grid_data_source" xsi:type="string">Infobeans\Switchorderowner\Model\ResourceModel\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Infobeans\Switchorderowner\Model\ResourceModel\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">ib_switchorderowner_history</argument>
+            <argument name="resourceModel" xsi:type="string">Infobeans\Switchorderowner\Model\ResourceModel\History</argument>
+        </arguments>
+    </type>-->
+</config>

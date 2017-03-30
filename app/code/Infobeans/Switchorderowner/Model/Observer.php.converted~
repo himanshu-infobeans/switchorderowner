@@ -1,0 +1,93 @@
+<?php
+/**
+ * InfoBeans (India) Pvt. Ltd.
+ *
+ * @category   Infobeans
+ * @package    Infobeans_Switchorderowner
+ */
+
+namespace ;
+
+class 
+{
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    public function __construct(
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+    ) {
+        $this->scopeConfig = $scopeConfig;
+    }
+    /**
+     * Helper
+     *
+     * @return Infobeans_Switchorderowner_Helper_Data
+     */
+    protected function _helper()
+    {
+        return Mage::helper('switchorderowner');
+    }
+
+    public function generateBlockAfter($event)
+    {
+        $block = $event->getBlock();
+
+        // Order View
+        if ($block && ($block->getNameInLayout() == 'sales_order_edit')) {
+            if ($block instanceof Mage_Adminhtml_Block_Sales_Order_View) {
+
+                /** @var Infobeans_Switchorderowner_Model_Order $order */
+                $order = Mage::helper('switchorderowner/order')->getOrder();
+                $state = explode(",", $this->scopeConfig->getValue('switchorderowner/general/orderstate', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+                $orderState = $order->getStatus();
+                
+                if (!in_array($orderState , $state)) {
+                    if ($order->isGuestOrder() && $this->_helper()->isAllowed()) {
+                        $block->addButton('switchOrder', array(
+                            'label' => $this->_helper()->__("Switch Order Owner"),
+                            'onclick' => "javascript: switchorderownerRowClick()",
+                            'class' => 'switch-order',
+                        ));
+                    } else {
+                        $block->addButton('switchOrder', array(
+                            'label' => $this->_helper()->__("Switch Order Owner"),
+                            'onclick' => "javascript: switchorderownerRowClick()",
+                            'class' => 'switch-order',
+                        ));
+                    }
+                }
+            }
+        }
+    }
+
+    public function massActionOption($observer)
+    {
+        if (!$this->_helper()->extEnabled()) {
+            return;
+        }
+
+        $block = $observer->getBlock();
+        $allowedNames = array(
+            'Enterprise_SalesArchive_Block_Adminhtml_Sales_Order_Grid_Massaction',
+            'Enterprise_Salesarchive_Block_Widget_Grid_Massaction',
+            'Mage_Adminhtml_Block_Widget_Grid_Massaction',
+        );
+
+        if ($block && in_array(get_class($block), $allowedNames)) {
+            $allowedControllerNames = array(
+                'sales_order',
+            );
+
+            if ( in_array($block->getRequest()->getControllerName(), $allowedControllerNames) ) {
+                $backendUrl = Mage::getSingleton('adminhtml/url');
+                $block->addItem('switch', array(
+                    'label' => $this->_helper()->__("Switch Order Owner"),
+                    'url' =>  "javascript:switchorderownerRowClick();",
+                ));
+            }
+        }
+    }
+}

@@ -1,0 +1,94 @@
+<?php
+$_storeSturcuture = $block->getStoresStructure();
+$params = $block->getRequest()->getParams();
+$order_ids = (isset($params['order_id']) && $params['order_id']) ? $params['order_id'] : '';
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance(); 
+$FormKey = $objectManager->get('Magento\Framework\Data\Form\FormKey'); 
+?>
+<div id="switchowner-maindiv" style="display: none">
+    <form
+        class="form"
+        action="<?php echo $block->getSwitchOrderOwnerSaveUrl(); ?>"
+        id="switch-owner-form" 
+        method="post"
+        data-hasrequired="<?php /* @escapeNotVerified */ echo __('* Required Fields') ?>"
+        data-mage-init='{"validation":{}}'>
+        <fieldset class="fieldset">
+            <legend class="legend"><span><?php echo $block->escapeHtml(__('Switch Owner')) ?></span></legend><br />
+            <?php if (count($_storeSturcuture) >= 1): ?>
+                <div class="admin__field" id="switchowner-store-dropdown">
+                    <label class="label" for="store_group_id"><span><?php echo $block->escapeHtml(__('Store')) ?>*</span></label>
+                    <div class="">
+                        <select style="width:350px;" tabindex="5" id="store_group_id" name="store_group_id" data-placeholder="<?php echo __('Store') ?>" class="chosen-select validate-select ">
+                        <option value=""></option>
+                            <?php
+                            $i = 1;
+                            $j = 1;
+                            foreach ($_storeSturcuture as $k => $v){  ?>
+                                <optgroup label="<?php echo __($v['websites'][$i]);  ?>">
+                                <?php foreach ($v['websites']['stores'] as $p => $q) { ?>
+                                    <?php if (is_string($q)) { $optlabel = $q; } ?>
+                                        <?php
+                                        if (is_array($q)) { ?>
+                                        <optgroup label="<?php echo $optlabel; ?>">
+                                           <?php foreach ($q as $key => $val) {
+                                                ?>
+                                                <option value="<?php echo __('store_' . $j); ?>"><?php echo __($val); ?></option>
+                                            <?php } ?>
+                                            <?php
+                                            $j++; ?>
+                                      </optgroup> 
+                            <?php }} ?>
+                                    </optgroup>
+                                <?php
+                                $i++; ?> 
+                            <?php } ?>
+                        </select>
+                    </div>
+                </div>
+<?php endif; ?>
+            <div class="admin__field" id="switchowner-customer-dropdown">
+                <label class="label" for="customer-list"><span><?php echo $block->escapeHtml(__('Customers')) ?>*</span></label>
+                <div class="">
+                    <select style="width:350px;" tabindex="5" id="customer-list" name="customer-list" class="chosen-select validate-select">
+                        <option value="">Select Customer</option>
+                    </select>
+                </div>
+            </div>
+            <div class="admin__field">
+                <input type="checkbox" class="checkbox" name="send_email" id="send_email_checkbox" />
+                <label for="send_email_checkbox"><?php echo __("Notify New Owner & Send Copy To Admin"); ?></label>
+            </div>
+            <input type="hidden" class="hidden" name="order_ids" id="order_ids"  value="<?php echo (isset($order_ids) && $order_ids) ? $order_ids : ''; ?>" />
+            <input type="hidden" class="hidden" name="customer_id" id="customer_id" value="" />
+            <input name="form_key" type="hidden" value="<?php echo $FormKey->getFormKey();?>">
+        </fieldset>
+    </form>
+</div>
+<script type="text/x-magento-init">
+    {
+    "*": {
+    "Infobeans_Switchorderowner/js/fetch_customer": {
+    "fetchCustomerUrl" : "<?php echo $block->escapeUrl($block->getCustomerDataUrl()); ?>"
+    }
+    }
+
+    }   
+</script>
+<script type="text/javascript">
+    require(['jquery', 'Infobeans_Switchorderowner/js/chosen.jquery'], function ($,chosen) {
+        $(window).load(function () {
+            $('.chosen-select').chosen();
+            var config = {
+                '.chosen-select': {},
+                '.chosen-select-deselect': {allow_single_deselect: true},
+                '.chosen-select-no-single': {disable_search_threshold: 10},
+                '.chosen-select-no-results': {no_results_text: 'Oops, nothing found!'},
+                '.chosen-select-width': {width: "95%"}
+            }
+            for (var selector in config) {
+                $(selector).chosen(config[selector]);
+            }
+        });
+        });
+</script>

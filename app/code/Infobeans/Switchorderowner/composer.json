@@ -1,0 +1,27 @@
+{
+    "name": "infobeans/switchorderowner",
+    "description": "Switch Order Owner",
+    "require": {
+        
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "2.*"
+    },
+    "suggest":{
+        
+    },
+    "type":"infobeans-module",
+    "version": "2.0.0",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Infobeans\\Switchorderowner\\": ""
+        }
+    }
+}

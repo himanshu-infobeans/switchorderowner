@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <switchorderowner>
+            <general>
+                <orderstate>
+			canceled,closed,fraud,payment_review,paypal_canceled_reversal,paypal_reversed,pending_payment,pending_paypal
+		</orderstate>
+            </general>
+            <address>
+                <override_billing_shipping>1</override_billing_shipping>
+                <override_name>1</override_name>
+            </address>
+            <notification>
+                <enabled>1</enabled>
+                <identity>sales</identity>
+                <template>switchorderowner_notification_template</template>
+            </notification>
+            <jquery>
+                <enabled>1</enabled>
+            </jquery>
+        </switchorderowner>
+    </default>
+</config>
