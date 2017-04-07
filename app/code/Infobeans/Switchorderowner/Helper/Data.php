@@ -9,30 +9,30 @@
 namespace Infobeans\Switchorderowner\Helper;
 
 use \Magento\Framework\App\Helper\AbstractHelper;
-
 use Magento\Framework\App as App;
 
 class Data extends AbstractHelper
 {
     /**
-     * 
      * @param \Magento\Framework\App\Helper\Context $context
      */
     public function __construct(
         App\Helper\Context $context
-             ){
+    ) {
         parent::__construct(
             $context
         );
     }
     
     /**
-     * 
      * @return bool
      */
     public function configNotificationEnabled()
     {
-        return $this->scopeConfig->getValue('switchorderowner/notification/enabled', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        return $this->scopeConfig->getValue(
+            'switchorderowner/notification/enabled',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
     }
 
     /**

@@ -12,11 +12,25 @@ use Magento\Framework\DataObject\IdentityInterface;
 class History extends \Magento\Framework\Model\AbstractModel implements IdentityInterface
 {
     protected $_order = null;
-   
-    
     protected $_details = null;
     
-     /**
+    protected $orderFactory;
+    protected $detailFactory;
+    
+    public function __construct(
+        \Infobeans\Switchorderowner\Model\OrderFactory $orderFactory,
+        \Infobeans\Switchorderowner\Model\DetailFactory $detailFactory,
+        \Magento\Framework\Model\Context $context,
+        \Magento\Framework\Registry $registry,
+        \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
+        \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
+        array $data = array()
+    ) {
+        $this->orderFactory = $orderFactory;
+        $this->detailFactory = $detailFactory;
+        parent::__construct($context, $registry, $resource, $resourceCollection, $data);
+    }
+    /**
      * Initialize resource model
      *
      * @return void
@@ -37,19 +51,16 @@ class History extends \Magento\Framework\Model\AbstractModel implements Identity
     }
     
     /**
-     * 
      * @return boolean | \Infobeans\Switchorderowner\Model\Order
-     * 
+     *
      */
     public function getOrder()
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         if (!$this->_order) {
             if ($orderId = $this->getOrderId()) {
-
-                $order = $objectManager->create('\Infobeans\Switchorderowner\Model\Order')->load($orderId);
+                $order = $this->orderFactory->create()->load($orderId);
                 $this->_order = $order;
-
             } else {
                 return false;
             }
@@ -58,7 +69,6 @@ class History extends \Magento\Framework\Model\AbstractModel implements Identity
     }
 
     /**
-     * 
      * @param \Magento\Sales\Model\Order $order
      * @param type $sendEmail
      * @return \Infobeans\Switchorderowner\Model\History
@@ -71,14 +81,13 @@ class History extends \Magento\Framework\Model\AbstractModel implements Identity
         $timestamp = $dateTime->gmtTimestamp();
         $this->setOrderId($order->getId())
             ->setIsNotified($sendEmail ? 1 : 0)
-            ->setAssignTime($dateTime->date('',$timestamp))
+            ->setAssignTime($dateTime->date('', $timestamp))
             ->save();
 
         return $this;
     }
     
     /**
-     * 
      * @param type $key
      * @param type $from
      * @param type $to
@@ -87,7 +96,7 @@ class History extends \Magento\Framework\Model\AbstractModel implements Identity
     public function addDetails($key, $from = null, $to = null)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $detail = $objectManager->create('\Infobeans\Switchorderowner\Model\Detail');
+        $detail = $this->detailFactory->create();
         
         $detail->setHistoryId($this->getId())
             ->setDataKey($key)
@@ -99,7 +108,6 @@ class History extends \Magento\Framework\Model\AbstractModel implements Identity
     }
     
     /**
-     * 
      * @return type
      */
     public function getDetails()
@@ -108,7 +116,7 @@ class History extends \Magento\Framework\Model\AbstractModel implements Identity
         
         if (!$this->_details) {
             /** @var $collection  Infobeans_Switchorderowner_Model_Mysql4_Detail_Collection */
-            $collection = $objectManager->create('\Infobeans\Switchorderowner\Model\Detail')->getCollection();
+            $collection = $this->detailFactory->create()->getCollection();
             $collection->addFieldToFilter('history_id', $this->getId());
             $this->_details = $collection;
         }
@@ -116,7 +124,6 @@ class History extends \Magento\Framework\Model\AbstractModel implements Identity
     }
     
     /**
-     * 
      * @return type
      */
     public function hasDetails()
@@ -125,28 +132,24 @@ class History extends \Magento\Framework\Model\AbstractModel implements Identity
     }
     
     /**
-     * 
      * @return string
      */
     public function getAssignTime()
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $dateTime = $objectManager->create('\Magento\Framework\Stdlib\DateTime\DateTime');
-        return $dateTime->date('dM, y H:i:s',$this->getData('assign_time'));
+        return $dateTime->date('dM, y H:i:s', $this->getData('assign_time'));
     }
     
     /**
-     * 
      * @return string | url
      */
     public function getCustomerUrl()
     {
-//        echo $this->getUrl('customer/index/edit', array('id' => $this->getCustomer()->getId()));exit;
-        return $this->getUrl('customer/index/edit', array('id' => $this->getCustomer()->getId()));
+        return $this->getUrl('customer/index/edit', ['id' => $this->getCustomer()->getId()]);
     }
     
     /**
-     * 
      * @return \Infobeans\Switchorderowner\Model\Varien_Object
      */
     public function getCustomer()
@@ -167,16 +170,14 @@ class History extends \Magento\Framework\Model\AbstractModel implements Identity
     }
     
     /**
-     * 
      * @return string | url
      */
     public function getAdminUrl()
     {
-        return $this->getUrl('adminhtml/permissions_user/edit', array('user_id' => $this->getAdmin()->getUserId()));
+        return $this->getUrl('adminhtml/permissions_user/edit', ['user_id' => $this->getAdmin()->getUserId()]);
     }
     
     /**
-     * 
      * @return \Infobeans\Switchorderowner\Model\Varien_Object
      */
     public function getAdmin()
@@ -197,14 +198,14 @@ class History extends \Magento\Framework\Model\AbstractModel implements Identity
     }
     
     /**
-     * 
      * @return type
      */
     public function getFromData()
     {
-        $data = array();
+        $data = [];
 
-        foreach ($this->getDetails() as $detail){
+        foreach ($this->getDetails() as $detail)
+        {
             $data[$detail->getDataKey()] = $detail->getFrom();
         }
 

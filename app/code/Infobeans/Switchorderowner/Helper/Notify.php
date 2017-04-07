@@ -12,37 +12,45 @@ use \Magento\Framework\App as App;
 
 class Notify extends AbstractHelper
 {
-
-    protected $_ownerHelperData;
+    /**
+     * @var \Infobeans\Switchorderowner\Helper\Data
+     */
+    protected $ownerHelperData;
     
-    protected $_customerFactory;
-
-    protected $_dataObject;
+    /**
+     * @var type
+     */
+    protected $customerFactory;
+    
+    /**
+     * @var \Magento\Framework\DataObject
+     */
+    protected $dataObject;
 
     /**
      * @var \Magento\Framework\Mail\Template\TransportBuilder
      */
-    protected $_transportBuilder;
+    protected $transportBuilder;
     
     /**
-     * 
+     * @param \Infobeans\Switchorderowner\Helper\Data $ownerHelperData
      * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Framework\DataObject $dataObject
+     * @param \Magento\Customer\Model\Customer $customerFactory
      * @param \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder
      */
     public function __construct(
-            \Magento\Framework\DataObject $dataObject,
-            \Magento\Customer\Model\Customer $customerFactory,
-            \Infobeans\Switchorderowner\Helper\Data $ownerHelperData,
-            App\Helper\Context $context,
-            \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder
+        \Infobeans\Switchorderowner\Helper\Data $ownerHelperData,
+        App\Helper\Context $context,
+        \Magento\Framework\DataObject $dataObject,
+        \Magento\Customer\Model\customerFactory $customerFactory,
+        \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder
     ) {
-        parent::__construct(
-                $context
-        );
-        $this->_transportBuilder = $transportBuilder;
-        $this->_ownerHelperData = $ownerHelperData;
-        $this->_customerFactory = $customerFactory;
-        $this->_dataObject = $dataObject;
+        parent::__construct($context);
+        $this->transportBuilder = $transportBuilder;
+        $this->ownerHelperData = $ownerHelperData;
+        $this->customerFactory = $customerFactory;
+        $this->dataObject = $dataObject;
     }
 
     /**
@@ -53,19 +61,23 @@ class Notify extends AbstractHelper
      * @param $customerIsGuest
      * @return $this
      */
-    public function notifyCustomer(\Infobeans\Switchorderowner\Model\Order $order, $customerId, $customerIsGuest) {
-        if (!$this->_ownerHelperData->configNotificationEnabled()) {
+    public function notifyCustomer(
+        \Infobeans\Switchorderowner\Model\Order $order,
+        $customerId,
+        $customerIsGuest
+    ) {
+        if (!$this->ownerHelperData->configNotificationEnabled()) {
             return $this;
         }
 
         $store = $order->getStore();
         $storeId = $order->getStoreId();
-        $customer = $this->_customerFactory->create()->load($customerId);
+        $customer = $this->customerFactory->create()->load($customerId);
 
         $customerPrevName = $order->getPreviousCustomerName();
         $customerIsGuest = $customerIsGuest && !$customerIsGuest;
         
-        $postObject = $this->_dataObject;
+        $postObject = $this->dataObject;
 
         $vars = [
             'order' => $order,
@@ -78,10 +90,22 @@ class Notify extends AbstractHelper
         
         $postObject->setData($vars);
         
-        $template = $this->scopeConfig->getValue('switchorderowner/notification/template', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
-        $sender = $this->scopeConfig->getValue('switchorderowner/notification/identity', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
-        $copyTo = $this->scopeConfig->getValue('switchorderowner/notification/copy_to', \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
-        $receivers = array($customer->getEmail());
+        $template = $this->scopeConfig->getValue(
+            'switchorderowner/notification/template',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+        $sender = $this->scopeConfig->getValue(
+            'switchorderowner/notification/identity',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+        $copyTo = $this->scopeConfig->getValue(
+            'switchorderowner/notification/copy_to',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+        $receivers = [$customer->getEmail()];
 
         if ($copyTo) {
             $copyReceivers = explode(",", $copyTo);
@@ -90,27 +114,26 @@ class Notify extends AbstractHelper
 
         foreach ($receivers as $receiver) {
             try {
-                $transport = $this->_transportBuilder->setTemplateIdentifier($template)
+                $transport = $this->transportBuilder->setTemplateIdentifier($template)
                         ->setTemplateOptions(
-                                ['area' => \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE, 'store' => $storeId]
-                                )
+                            ['area' => \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE, 'store' => $storeId]
+                        )
                         ->setTemplateVars(
-                                ['data' => $postObject]
-                                )
+                            ['data' => $postObject]
+                        )
                         ->setFrom(
-                                $sender
-                                )
+                            $sender
+                        )
                         ->addTo(
-                                trim($receiver),$customer->getName()
-                                )
+                            trim($receiver),
+                            $customer->getName()
+                        )
                         ->getTransport();
                 $transport->sendMessage();
             } catch (\Exception $e) {
-                
             }
         }
 
         return $this;
     }
-
 }

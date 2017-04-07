@@ -10,40 +10,47 @@ namespace Infobeans\Switchorderowner\Controller\Adminhtml\Switchorder;
 
 use Magento\Backend\App\Action\Context;
 
-class Save extends \Magento\Backend\App\Action {
+class Save extends \Magento\Backend\App\Action
+{
+    /**
+     * @var \Infobeans\Switchorderowner\Helper\OrderFactory
+     */
+    protected $helperOrderFactory;
     
-    protected $_helperOrderFactory;
+    /**
+     * @var \Magento\Customer\Model\CustomerFactory
+     */
+    protected $customerFactory;
     
-    protected $_customerFactory;
-    
-    protected $_storeFactory;
+    /**
+     * @var \Magento\Store\Model\StoreFactory
+     */
+    protected $storeFactory;
 
     /**
      * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $_scopeConfig;
+    protected $scopeConfig;
 
     /**
-     * 
      * @param Context $context
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-            \Magento\Store\Model\StoreFactory $storeFactory,
-            \Magento\Customer\Model\CustomerFactory $customerFactory,
-            \Infobeans\Switchorderowner\Helper\Order $helperOrderFactory,
-            Context $context,
-            \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig) {
-         
+        \Magento\Store\Model\StoreFactory $storeFactory,
+        \Magento\Customer\Model\CustomerFactory $customerFactory,
+        \Infobeans\Switchorderowner\Helper\OrderFactory $helperOrderFactory,
+        Context $context,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+    ) {
         parent::__construct($context);
-        $this->_scopeConfig = $scopeConfig;
-        $this->_helperOrderFactory = $helperOrderFactory;
-        $this->_customerFactory = $customerFactory;
-        $this->_storeFactory = $storeFactory;
+        $this->scopeConfig = $scopeConfig;
+        $this->helperOrderFactory = $helperOrderFactory;
+        $this->customerFactory = $customerFactory;
+        $this->storeFactory = $storeFactory;
     }
 
     /**
-     * 
      * @return void
      */
     public function execute()
@@ -54,38 +61,52 @@ class Save extends \Magento\Backend\App\Action {
         
         $orderIds = (isset($params['order_ids']) && $params['order_ids']) ? $params['order_ids'] : 0;
         $orderIds = explode(",", $orderIds);
-        $overwriteName = $this->_scopeConfig->getValue('switchorderowner/address/override_name', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $overwriteAddress = $this->_scopeConfig->getValue('switchorderowner/address/override_billing_shipping', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $overwriteName = $this->scopeConfig->getValue(
+            'switchorderowner/address/override_name',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        $overwriteAddress = $this->scopeConfig->getValue(
+            'switchorderowner/address/override_billing_shipping',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
         $success = 0;
         $error = 0;
         $websiteError = 0;
         $websiteErrorMsg = "";
         $orderStatusError = 0;
         $orderStatusErrorMsg = "";
-        $acountSharingOption = $this->_scopeConfig->getValue('customer/account_share/scope', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
-        $state = explode(",", $this->_scopeConfig->getValue('switchorderowner/order_setting/orderstate', \Magento\Store\Model\ScopeInterface::SCOPE_STORE));
+        $acountSharingOption = $this->scopeConfig->getValue(
+            'customer/account_share/scope',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        $state = explode(
+            ",",
+            $this->scopeConfig->getValue(
+                'switchorderowner/order_setting/orderstate',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            )
+        );
         
-        $_orderHelper = $this->_helperOrderFactory;
+        $_orderHelper = $this->helperOrderFactory;
         if ($customerId) {
             foreach ($orderIds as $orderId) {
                 $canOwnerSwitch = 1;
                 if ($customerId && $orderId) {
                     $order = $_orderHelper->getOrder($orderId);
                     $orderState = $order->getStatus();
-                    $customer = $this->_customerFactory->create()->load($customerId);
+                    $customer = $this->customerFactory->create()->load($customerId);
                     $newCustomerWebsiteId = $customer->getWebsiteId();
-                    $oldCustomerWebsiteId = $this->_storeFactory->create()->load($order->getStoreId())->getWebsiteId();
+                    $oldCustomerWebsiteId = $this->storeFactory->create()->load($order->getStoreId())->getWebsiteId();
                     if ($acountSharingOption == 1 && $newCustomerWebsiteId != $oldCustomerWebsiteId) {
                         $canOwnerSwitch = 0;
                     }
                     if (!in_array($orderState, $state) && $canOwnerSwitch == 1) {
-                        
                         $order->switchOrderOwner($customerId, $overwriteName, $sendEmail, $overwriteAddress);
                         $success++;
-                    } else if ($canOwnerSwitch == 0) {
+                    } elseif ($canOwnerSwitch == 0) {
                         $websiteError++;
                         $websiteErrorMsg = $websiteErrorMsg . $order->getIncrementId() . ", ";
-                    } else if (in_array($orderState, $state)) {
+                    } elseif (in_array($orderState, $state)) {
                         $orderStatusError++;
                         $orderStatusErrorMsg = $orderStatusErrorMsg . $order->getIncrementId() . ", ";
                     } else {
@@ -100,10 +121,18 @@ class Save extends \Magento\Backend\App\Action {
                     $this->messageManager->addSuccess(__("%s Order owner were successfully switched.", $success));
                 }
                 if ($websiteError) {
-                    $this->messageManager->addError(__("Order owner can not be switched for %s as the selected customer belongs to the different website.", rtrim($websiteErrorMsg, ", ")));
+                    $this->messageManager->addError(__(
+                        "Order owner can not be switched for %s as the "
+                        . "selected customer belongs to the different website.",
+                        rtrim($websiteErrorMsg, ", ")
+                    ));
                 }
                 if ($orderStatusError) {
-                    $this->messageManager->addError(__("Order owner can not be switched for %s as it can not be processed further.", rtrim($orderStatusErrorMsg, ", ")));
+                    $this->messageManager->addError(__(
+                        "Order owner can not be switched for %s as"
+                        . " it can not be processed further.",
+                        rtrim($orderStatusErrorMsg, ", ")
+                    ));
                 }
                 if ($error) {
                     $this->messageManager->addError(__("%s Order were not be updated due to some error.", $error));
@@ -115,10 +144,18 @@ class Save extends \Magento\Backend\App\Action {
                     $this->messageManager->addSuccess(__("Order owner was successfully switched."));
                 }
                 if ($websiteError) {
-                    $this->messageManager->addError(__("Order %s owner can not be switched as the selected customer belongs to the different website.", rtrim($websiteErrorMsg, ", ")));
+                    $this->messageManager->addError(__(
+                        "Order %s owner can not be switched as the"
+                        . " selected customer belongs to the different website.",
+                        rtrim($websiteErrorMsg, ", ")
+                    ));
                 }
                 if ($orderStatusError) {
-                    $this->messageManager->addError(__("Order %s owner can not be switched as it can not be processed further.", rtrim($orderStatusErrorMsg, ", ")));
+                    $this->messageManager->addError(__(
+                        "Order %s owner can not be switched as"
+                        . " it can not be processed further.",
+                        rtrim($orderStatusErrorMsg, ", ")
+                    ));
                 }
                 if ($error) {
                     $this->messageManager->addError(__("Order was not be updated due to some error."));
@@ -128,15 +165,15 @@ class Save extends \Magento\Backend\App\Action {
         } else {
             $this->messageManager->addError(__("Some data was missed or your session was expired. Please try again."));
             if ($orderId = $this->_request->getParams('order_id')) {
-                $this->_redirect('sales/order/view', array('order_id' => $orderId));
+                $this->_redirect('sales/order/view', ['order_id' => $orderId]);
             } else {
                 $this->_redirect('sales/order/index');
             }
         }
-        return;
     }
     
-    protected function _isAllowed() {
-    return true;
+    protected function _isAllowed()
+    {
+        return true;
     }
 }

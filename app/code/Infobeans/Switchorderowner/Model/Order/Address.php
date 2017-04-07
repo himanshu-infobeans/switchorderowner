@@ -8,7 +8,7 @@
 
 namespace Infobeans\Switchorderowner\Model\Order;
 
-
-class Address extends \Magento\Sales\Model\Order\Address {
+class Address extends \Magento\Sales\Model\Order\Address
+{
     
 }

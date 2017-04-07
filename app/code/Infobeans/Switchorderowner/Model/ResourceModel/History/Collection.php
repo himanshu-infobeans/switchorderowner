@@ -24,12 +24,12 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     protected function _construct()
     {
-        $this->_init('Infobeans\Switchorderowner\Model\History', 'Infobeans\Switchorderowner\Model\ResourceModel\History');
+        $this->_init(
+            'Infobeans\Switchorderowner\Model\History',
+            'Infobeans\Switchorderowner\Model\ResourceModel\History'
+        );
     }
     
-    /**
-     * 
-     */
     protected function _afterLoad()
     {
         parent::_afterLoad();
@@ -50,5 +50,4 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
         }
         return $this->_last;
     }
-
 }

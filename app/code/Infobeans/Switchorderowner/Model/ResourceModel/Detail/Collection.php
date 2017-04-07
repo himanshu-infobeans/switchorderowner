@@ -22,6 +22,9 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
      */
     protected function _construct()
     {
-        $this->_init('Infobeans\Switchorderowner\Model\Detail', 'Infobeans\Switchorderowner\Model\ResourceModel\Detail');
+        $this->_init(
+            'Infobeans\Switchorderowner\Model\Detail',
+            'Infobeans\Switchorderowner\Model\ResourceModel\Detail'
+        );
     }
 }
